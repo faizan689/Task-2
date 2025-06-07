@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blockchain Mining Simulator</title>
+    <style>
+      /* Main styling with a techy, futuristic feel */
+      body {
+        font-family: "Courier New", monospace;
+        background: linear-gradient(to bottom right, #0a192f, #172a45);
+        color: #64ffda;
+        line-height: 1.6;
+        padding: 20px;
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: rgba(10, 25, 47, 0.8);
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(100, 255, 218, 0.2);
+      }
+
+      h1 {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 30px;
+        color: #64ffda;
+        text-shadow: 0 0 10px rgba(100, 255, 218, 0.3);
+        letter-spacing: 1px;
+      }
+
+      h2 {
+        color: #64ffda;
+        margin: 25px 0 15px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid rgba(100, 255, 218, 0.3);
+      }
+
+      /* Control panel styling */
+      .control-panel {
+        background: rgba(23, 42, 69, 0.6);
+        padding: 25px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        border: 1px solid rgba(100, 255, 218, 0.2);
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        color: #64ffda;
+        font-weight: bold;
+      }
+
+      input,
+      select {
+        width: 100%;
+        padding: 12px;
+        background: rgba(10, 25, 47, 0.8);
+        border: 1px solid #64ffda;
+        border-radius: 6px;
+        color: #fff;
+        font-family: "Courier New", monospace;
+        font-size: 16px;
+        transition: all 0.3s ease;
+      }
+
+      input:focus,
+      select:focus {
+        outline: none;
+        border-color: #64ffda;
+        box-shadow: 0 0 10px rgba(100, 255, 218, 0.3);
+      }
+
+      /* Button styling */
+      .btn {
+        display: inline-block;
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #64ffda, #00b4d8);
+        color: #0a192f;
+        border: none;
+        border-radius: 6px;
+        font-family: "Courier New", monospace;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-right: 10px;
+        margin-top: 10px;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(100, 255, 218, 0.4);
+      }
+
+      .btn:disabled {
+        background: #495670;
+        color: #8892b0;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .btn-stop {
+        background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+      }
+
+      /* Mining progress section */
+      .mining-progress {
+        display: none;
+        background: rgba(23, 42, 69, 0.6);
+        padding: 25px;
+        border-radius: 10px;
+        margin: 25px 0;
+        border: 1px solid rgba(100, 255, 218, 0.2);
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin: 20px 0;
+      }
+
+      .stat-card {
+        background: rgba(10, 25, 47, 0.8);
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid rgba(100, 255, 218, 0.2);
+        text-align: center;
+      }
+
+      .stat-value {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #64ffda;
+        margin-bottom: 5px;
+      }
+
+      .stat-label {
+        color: #8892b0;
+        font-size: 0.9rem;
+      }
+
+      .hash-display {
+        background: rgba(10, 25, 47, 0.8);
+        padding: 15px;
+        border-radius: 6px;
+        border: 1px solid rgba(100, 255, 218, 0.2);
+        font-family: "Courier New", monospace;
+        word-break: break-all;
+        margin: 15px 0;
+        color: #ccd6f6;
+      }
+
+      .valid-hash {
+        border-color: #64ffda;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 5px rgba(100, 255, 218, 0.3);
+        }
+        50% {
+          box-shadow: 0 0 20px rgba(100, 255, 218, 0.6);
+        }
+        100% {
+          box-shadow: 0 0 5px rgba(100, 255, 218, 0.3);
+        }
+      }
+
+      /* Results section */
+      .results {
+        display: none;
+        margin-top: 30px;
+      }
+
+      .block-info {
+        background: rgba(23, 42, 69, 0.6);
+        padding: 25px;
+        border-radius: 10px;
+        margin-top: 20px;
+        border: 1px solid rgba(100, 255, 218, 0.2);
+      }
+
+      .block-info p {
+        margin-bottom: 10px;
+        color: #ccd6f6;
+      }
+
+      .block-info strong {
+        color: #64ffda;
+      }
+
+      /* Difficulty examples */
+      .difficulty-examples {
+        background: rgba(255, 215, 0, 0.1);
+        padding: 20px;
+        border-radius: 10px;
+        margin: 25px 0;
+        border: 1px solid rgba(255, 215, 0, 0.3);
+      }
+
+      .difficulty-example {
+        margin: 15px 0;
+        padding: 12px;
+        background: rgba(10, 25, 47, 0.6);
+        border-radius: 6px;
+        color: #ccd6f6;
+      }
+
+      .difficulty-example strong {
+        color: #ffd700;
+      }
+
+      /* Loading animation */
+      .loader {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(100, 255, 218, 0.3);
+        border-radius: 50%;
+        border-top-color: #64ffda;
+        animation: spin 1s ease-in-out infinite;
+        vertical-align: middle;
+        margin-right: 10px;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 768px) {
+        .container {
+          padding: 20px;
+        }
+
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .btn {
+          width: 100%;
+          margin-bottom: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Blockchain Mining Simulator</h1>
+
+      <div class="control-panel">
+        <h2>Mining Configuration</h2>
+
+        <div class="form-group">
+          <label for="difficulty">Mining Difficulty:</label>
+          <select id="difficulty">
+            <option value="1">Level 1 - Easy (starts with "0")</option>
+            <option value="2">Level 2 - Moderate (starts with "00")</option>
+            <option value="3">Level 3 - Challenging (starts with "000")</option>
+            <option value="4" selected>
+              Level 4 - Hard (starts with "0000")
+            </option>
+            <option value="5">Level 5 - Extreme (starts with "00000")</option>
+            <option value="6">Level 6 - Insane (starts with "000000")</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="blockData">Block Data:</label>
+          <input
+            type="text"
+            id="blockData"
+            value="Transaction: Faizan sends Jay 5 BTC"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="previousHash">Previous Block Hash:</label>
+          <input
+            type="text"
+            id="previousHash"
+            value="000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f"
+          />
+        </div>
+
+        <button id="startMining" class="btn" onclick="startMining()">
+          <span class="loader" id="loader" style="display: none"></span>
+          Start Mining
+        </button>
+        <button
+          id="stopMining"
+          class="btn btn-stop"
+          onclick="stopMining()"
+          disabled
+        >
+          Stop Mining
+        </button>
+      </div>
+
+      <div class="difficulty-examples">
+        <h2>💡 Understanding Mining Difficulty</h2>
+        <div class="difficulty-example">
+          <strong>Level 1:</strong> Hash must begin with "0" (1 in 16 chance) -
+          Typically takes ~16 attempts
+        </div>
+        <div class="difficulty-example">
+          <strong>Level 2:</strong> Hash must begin with "00" (1 in 256 chance)
+          - Typically takes ~256 attempts
+        </div>
+        <div class="difficulty-example">
+          <strong>Level 4:</strong> Hash must begin with "0000" (1 in 65,536
+          chance) - Typically takes ~65,536 attempts
+        </div>
+        <div class="difficulty-example">
+          <strong>Level 6:</strong> Hash must begin with "000000" (1 in 16.7
+          million chance) - Typically takes ~16.7 million attempts
+        </div>
+      </div>
+
+      <div id="miningProgress" class="mining-progress">
+        <h2>🔄 Mining Progress</h2>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value" id="currentNonce">0</div>
+            <div class="stat-label">Current Nonce</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="hashRate">0</div>
+            <div class="stat-label">Hashes per Second</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="timeElapsed">0s</div>
+            <div class="stat-label">Time Elapsed</div>
+          </div>
+        </div>
+        <h3>Current Hash Attempt:</h3>
+        <div class="hash-display" id="currentHash">Waiting to start...</div>
+      </div>
+
+      <div id="results" class="results">
+        <h2>🎉 Mining Successful!</h2>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value" id="finalNonce">0</div>
+            <div class="stat-label">Final Nonce</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="totalAttempts">0</div>
+            <div class="stat-label">Total Attempts</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="miningTime">0s</div>
+            <div class="stat-label">Mining Duration</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="avgHashRate">0</div>
+            <div class="stat-label">Avg Hash Rate</div>
+          </div>
+        </div>
+
+        <div class="block-info">
+          <h3>📦 Mined Block Details</h3>
+          <p><strong>Block Data:</strong> <span id="finalData"></span></p>
+          <p>
+            <strong>Previous Hash:</strong> <span id="finalPrevHash"></span>
+          </p>
+          <p><strong>Timestamp:</strong> <span id="finalTimestamp"></span></p>
+          <p><strong>Nonce:</strong> <span id="finalNonceDisplay"></span></p>
+          <p><strong>Block Hash:</strong></p>
+          <div class="hash-display valid-hash" id="finalHash"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // java script
+      class Block {
+        constructor(data, previousHash) {
+          this.data = data;
+          this.previousHash = previousHash;
+          this.timestamp = new Date().toISOString();
+          this.nonce = 0;
+          this.hash = "";
+        }
+        async calculateHash() {
+          const blockString = `${this.data}${this.previousHash}${this.timestamp}${this.nonce}`;
+          const msgBuffer = new TextEncoder().encode(blockString);
+          const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
+          const hashArray = Array.from(new Uint8Array(hashBuffer));
+          return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+        }
+        async mineBlock(difficulty) {
+          const targetPrefix = "0".repeat(difficulty);
+          const startTime = Date.now();
+          let attempts = 0;
+          let lastUpdate = startTime;
+          let hashRate = 0;
+
+          while (true) {
+            this.hash = await this.calculateHash();
+            attempts++;
+
+            // Update UI
+            const currentTime = Date.now();
+            if (attempts % 100 === 0 || currentTime - lastUpdate > 100) {
+              const elapsedSeconds = (currentTime - startTime) / 1000;
+              hashRate =
+                elapsedSeconds > 0 ? Math.round(attempts / elapsedSeconds) : 0;
+
+              updateMiningUI(
+                this.nonce,
+                this.hash,
+                startTime,
+                attempts,
+                hashRate
+              );
+              lastUpdate = currentTime;
+
+              // Allow UI to update
+              await new Promise((resolve) => setTimeout(resolve, 0));
+
+              // Check if mining should stop
+              if (window.shouldStopMining) {
+                return null;
+              }
+            }
+
+            // Check if we've found a valid hash
+            if (this.hash.startsWith(targetPrefix)) {
+              const endTime = Date.now();
+              const totalTime = (endTime - startTime) / 1000;
+              const averageHashRate = Math.round(attempts / totalTime);
+
+              return {
+                block: this,
+                attempts: attempts,
+                timeElapsed: totalTime,
+                hashRate: averageHashRate,
+              };
+            }
+
+            this.nonce++;
+          }
+        }
+      }
+
+      // Global mining control variable
+      window.shouldStopMining = false;
+
+      // Update the mining progress UI
+      function updateMiningUI(nonce, hash, startTime, attempts, hashRate) {
+        const elapsedSeconds = ((Date.now() - startTime) / 1000).toFixed(1);
+
+        document.getElementById("currentNonce").textContent =
+          nonce.toLocaleString();
+        document.getElementById("hashRate").textContent =
+          hashRate.toLocaleString();
+        document.getElementById(
+          "timeElapsed"
+        ).textContent = `${elapsedSeconds}s`;
+        document.getElementById("currentHash").textContent = hash;
+      }
+
+      // Start the mining process
+      async function startMining() {
+        // Get user inputs
+        const difficulty = parseInt(
+          document.getElementById("difficulty").value
+        );
+        const blockData = document.getElementById("blockData").value.trim();
+        const previousHash = document
+          .getElementById("previousHash")
+          .value.trim();
+
+        // Validate inputs
+        if (!blockData) {
+          alert("Please enter some block data to mine");
+          return;
+        }
+
+        if (!previousHash) {
+          alert("Please enter a previous block hash");
+          return;
+        }
+
+        // Reset mining state
+        window.shouldStopMining = false;
+
+        // Update UI for mining start
+        document.getElementById("startMining").disabled = true;
+        document.getElementById("loader").style.display = "inline-block";
+        document.getElementById("stopMining").disabled = false;
+        document.getElementById("miningProgress").style.display = "block";
+        document.getElementById("results").style.display = "none";
+
+        // Create new block and start mining
+        const block = new Block(blockData, previousHash);
+
+        try {
+          const result = await block.mineBlock(difficulty);
+
+          if (result && !window.shouldStopMining) {
+            showMiningResults(result);
+          } else if (window.shouldStopMining) {
+            document.getElementById("miningProgress").style.display = "none";
+          }
+        } catch (error) {
+          console.error("Mining error:", error);
+          alert("An error occurred during mining: " + error.message);
+        } finally {
+          // Reset UI controls
+          document.getElementById("startMining").disabled = false;
+          document.getElementById("loader").style.display = "none";
+          document.getElementById("stopMining").disabled = true;
+        }
+      }
+
+      // Stop the mining process
+      function stopMining() {
+        window.shouldStopMining = true;
+        document.getElementById("startMining").disabled = false;
+        document.getElementById("loader").style.display = "none";
+        document.getElementById("stopMining").disabled = true;
+      }
+
+      // Display the mining results
+      function showMiningResults(result) {
+        const { block, attempts, timeElapsed, hashRate } = result;
+
+        // Hide mining progress
+        document.getElementById("miningProgress").style.display = "none";
+
+        // Show results section
+        document.getElementById("results").style.display = "block";
+
+        // Update statistics
+        document.getElementById("finalNonce").textContent =
+          block.nonce.toLocaleString();
+        document.getElementById("totalAttempts").textContent =
+          attempts.toLocaleString();
+        document.getElementById("miningTime").textContent =
+          timeElapsed.toFixed(2) + "s";
+        document.getElementById("avgHashRate").textContent =
+          hashRate.toLocaleString() + "/s";
+
+        // Update block information
+        document.getElementById("finalData").textContent = block.data;
+        document.getElementById("finalPrevHash").textContent =
+          block.previousHash;
+        document.getElementById("finalTimestamp").textContent = new Date(
+          block.timestamp
+        ).toLocaleString();
+        document.getElementById("finalNonceDisplay").textContent =
+          block.nonce.toLocaleString();
+        document.getElementById("finalHash").textContent = block.hash;
+      }
+
+      // Initialize with some sample data
+      document.getElementById("blockData").value =
+        "Transaction: Faizan sends Jay 5 BTC";
+      document.getElementById("previousHash").value =
+        "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f";
+    </script>
+  </body>
+</html>
